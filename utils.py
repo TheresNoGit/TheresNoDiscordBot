@@ -4,9 +4,81 @@ Functions/classes here should return text to be sent, rather than
 sending directly, unless they handle Discord exceptions.
 """
 import io
+from typing import Optional, Set, Tuple, Union
 
 from discord import File, HTTPException
 from discord.ext.commands import Context
+
+# Uses typing.Tuple rather than tuple due to <https://github.com/python/mypy/issues/9980>.
+AliasDictData = dict[Union[str, Tuple[str, ...]], str]
+
+
+class AliasDict(dict[str, str]):
+    """Create dicts for values that take many aliases (keys).
+
+    When setting a new item, implicitly sets {value: value} as well.
+    Will raise a ValueError if the value is already a key.
+
+    Attributes:
+      All inherited from `dict`.
+    """
+
+    _error_message = "AliasDict values and keys must not overlap."
+
+    def __init__(self,
+                 aliases: AliasDictData,
+                 value_isnt_alias: Optional[AliasDictData] = None,
+                 unaliased: Optional[Set[str]] = None) -> None:
+        """Constructs an AliasDict with no uninherited attributes.
+
+        Args:
+          aliases:  An AliasDictData of keys and values.  Keys can be
+            either strs or tuples thereof.  If a tuple, AliasDict will
+            convert this into each member of that tuple having the
+            relevant value.  (The tuple itself will not be preserved as
+            a key.)  For each value, a {value: value} mapping will also
+            be added to the dict.
+          value_isnt_alias:  An AliasDictData that is treated the same
+            as `aliases`, except that values do not become
+            {value: value} mappings.
+          unaliased:  A set of strs that will be turned into
+            {set item: set item} mappings.
+
+        Raises:
+          ValueError if the values and keys overlaps.
+        """
+        value_isnt_alias = (value_isnt_alias if value_isnt_alias is not None
+                            else {})
+        unaliased = unaliased if unaliased is not None else set()
+        if aliases.keys() & aliases.values() or aliases.keys() & unaliased:
+            raise ValueError(self._error_message)
+        data = {v: v for v in set(aliases.values()) | unaliased}
+        for k, v in aliases.items() | value_isnt_alias.items():
+            if isinstance(k, tuple):
+                for i in k:
+                    data[i] = v
+            else:
+                data[k] = v
+        super().__init__(data)
+        # Just here for __repr__ purposes.  Not used otherwise.
+        self._aliases = aliases
+        self._value_isnt_alias = value_isnt_alias
+        self._unaliased = unaliased
+
+    def __repr__(self) -> str:
+        return (f"AliasDict({self._aliases!r}, "
+                f"value_isnt_alias={self._value_isnt_alias!r}, "
+                f"unaliased={self._unaliased!r})")
+
+    def __str__(self) -> str:
+        # It makes sense if you (don't) think about it.  -- THK
+        return super().__repr__()
+
+    def __setitem__(self, key: str, value: str) -> None:
+        if value in self.keys():
+            raise ValueError(self._error_message)
+        super().__setitem__(key, value)
+        super().__setitem__(value, value)
 
 
 async def safesend(ctx: Context,

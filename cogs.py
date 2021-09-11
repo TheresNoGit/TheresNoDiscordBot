@@ -1,9 +1,10 @@
 """Cogs (categories of bot command)"""
 import discord
 from discord.ext import commands
-from discord.ext.commands import Bot, Cog, Context, MemberConverter
+from discord.ext.commands import Cog, Context, MemberConverter
 
 import constants
+
 
 class Mod(Cog, name="Moderation"):  # type: ignore
     """Mod-only commands"""
@@ -36,6 +37,7 @@ class BotInternal(Cog, name="Bot Internal", command_attrs={'hidden': True}):  # 
         "Ew"
         await ctx.send('Python would be *dangerous* if it was a **real** programming language.')
 
-    async def sendMsgToChannel(bot, channelId, message) -> None:
-        channel = Bot.get_channel(bot, channelId)
-        await channel.send(message)
+    @commands.command()
+    async def php(self, ctx: Context) -> None:
+        "Ew."
+        await ctx.send("https://www.youtube.com/watch?v=6otW6OXjR8c&t=281")

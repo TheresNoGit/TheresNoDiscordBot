@@ -1,20 +1,25 @@
-"""Good cabal bot"""
-import discord
+"""Good cabal bot."""
+import random
 import re
+
+import discord
+from discord import Message
 from discord.ext.commands import (Bot, Context, CommandError, CommandNotFound,
                                   UserInputError, MissingAnyRole)
 
 import cogs
 import constants
+import wikilink
 
 __version__ = constants.VERSION
 
 bot = Bot(command_prefix='!',
-          description="Based TheresNoBot\nCurrently just converting wikilinks for cabal goodness, but who knows what comes next",
+          description=("Based TheresNoBot\nCurrently just converting wikilinks "
+                       "for cabal goodness, but who knows what comes next"),
           intents=discord.Intents.default(),
           case_insensitive=True)
 
-wikilink_regex = re.compile('\[\[(?P<wikilink>.*?)\]\]')
+wikilink_regex = re.compile(r'\[\[(?P<wikilink>.*?)\]\]')
 
 
 @bot.event
@@ -25,17 +30,19 @@ async def on_ready() -> None:
 
 
 @bot.event
-async def on_message(message):
-    user = message.author
-    channel = message.channel
-    content = message.content
-    wikilink_match = wikilink_regex.match(content)
-
-    if wikilink_match:
-        msg = f"{constants.ENWIKI_URL}{wikilink_match.group('wikilink')}"
-        await channel.send(msg)
-
-    await bot.process_commands(message)
+async def on_message(message: Message) -> None:
+    """Run on every message."""
+    if message.author.discriminator != "0000":  # Ignore webhooks.
+        links = wikilink.extract(message.content)
+        print(links)
+        if links:
+            try:
+                await message.channel.send("\n".join(wikilink.parse(i)
+                                                     for i in links))
+            except UserInputError:
+                pass
+        else:
+            await bot.process_commands(message)
 
 
 @bot.event
@@ -55,11 +62,12 @@ async def on_command_error(ctx: Context,
             await ctx.send(v)
             break
     else:
-        await ctx.send("Unknown error.  Scream (at Tamzin cos this code is mostly hers).")
+        await ctx.send("Unknown error.  Scream (at Tamzin cos this code is mostly "
+                       f"{random.choice(['hers', 'theirs', 'xyrs'])}).")
 
 
 for cog in (cogs.BotInternal, cogs.Mod):
     bot.add_cog(cog(bot))
 
 
-bot.run(constants.DISCORD_KEY)
+bot.run("ODg2MDU1MzI2MTA3OTcxNjM2.YTwBUw.zSilvyG5NU_Q4PRO5PzwRjXMoe0")
