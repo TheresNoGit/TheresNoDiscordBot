@@ -52,9 +52,9 @@ async def on_command_error(ctx: Context,
     print(error)
     replies = {
         UserInputError: ("*You need to use the correct syntax...* "
-                         f"Type `!help {ctx.command}` for more information."),
+                         f"Type `~help {ctx.command}` for more information."),
         CommandNotFound: ("*You need to use a valid command...* "
-                          "Type `!help` for a list of commands."),
+                          "Type `~help` for a list of commands."),
         MissingAnyRole: ("You don't appear to have the correct role for this command. lel.")
     }
     for k, v in replies.items():
@@ -66,7 +66,7 @@ async def on_command_error(ctx: Context,
                        f"{random.choice(['hers', 'theirs', 'xyrs'])}).")
 
 
-for cog in (cogs.BotInternal, cogs.Mod):
+for cog in (cogs.BotInternal, cogs.Mod, cogs.General):
     bot.add_cog(cog(bot))
 
 

@@ -9,6 +9,9 @@ from typing import Optional, Set, Tuple, Union
 from discord import File, HTTPException
 from discord.ext.commands import Context
 
+import requests
+import constants
+
 # Uses typing.Tuple rather than tuple due to <https://github.com/python/mypy/issues/9980>.
 AliasDictData = dict[Union[str, Tuple[str, ...]], str]
 
@@ -125,3 +128,12 @@ async def safesend(ctx: Context,
                        + ("[Rest of o" if safe else "[O")
                        + "utput too long to send as message. Sorry.]",
                        file=file)
+
+async def send_email(from_email: str, to_email, subject: str, text: str) -> None:
+    return requests.post(
+        constants.EMAIL_API_URL,
+        auth=("api", constants.EMAIL_API_KEY),
+        data={"from": from_email,
+              "to": to_email,
+              "subject": subject,
+              "text": text})
