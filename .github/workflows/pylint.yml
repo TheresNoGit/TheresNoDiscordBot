@@ -20,7 +20,7 @@ jobs:
         pip install mypy
     - name: Analysing the code with mypy
       run: |
-        python -m mypy --install-types -v .
+        python -m mypy --install-types --non-interactive -v .
     - name: Discord notification 1
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
