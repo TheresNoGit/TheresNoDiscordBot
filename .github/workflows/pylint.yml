@@ -20,6 +20,7 @@ jobs:
         pip install mypy
     - name: Analysing the code with mypy
       run: |
+        python -m mypy --install-types
         python -m mypy -v .
     - name: Discord notification 1
       env:
