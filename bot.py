@@ -70,4 +70,4 @@ for cog in (cogs.BotInternal, cogs.Mod):
     bot.add_cog(cog(bot))
 
 
-bot.run("ODg2MDU1MzI2MTA3OTcxNjM2.YTwBUw.zSilvyG5NU_Q4PRO5PzwRjXMoe0")
+bot.run(constants.DISCORD_KEY)
