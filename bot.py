@@ -13,7 +13,7 @@ import wikilink
 
 __version__ = constants.VERSION
 
-bot = Bot(command_prefix='!',
+bot = Bot(command_prefix='~',
           description=("Based TheresNoBot\nCurrently just converting wikilinks "
                        "for cabal goodness, but who knows what comes next"),
           intents=discord.Intents.default(),
