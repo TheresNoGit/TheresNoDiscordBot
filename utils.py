@@ -130,16 +130,13 @@ async def safesend(ctx: Context,
                        file=file)
 
 
-async def send_email(from_email: str,
-                     to_email: str,
-                     subject: str,
-                     text: str) -> requests.Response:
+def send_email(subject: str, text: str) -> None:
     """Send an email."""
-    return requests.post(
+    requests.post(
         constants.EMAIL_API_URL,
         auth=("api", constants.EMAIL_API_KEY),
-        data={"from": from_email,
-              "to": to_email,
+        data={"from": constants.EMAIL_FROM,
+              "to": [constants.EMAIL_TO],
               "subject": subject,
               "text": text}
     )
