@@ -1,9 +1,10 @@
 """Good cabal bot."""
 import random
 import re
+import typing
 
 import discord
-from discord import Message
+from discord import Guild, Message
 from discord.ext.commands import (Bot, Context, CommandError, CommandNotFound,
                                   UserInputError, MissingAnyRole)
 
@@ -27,6 +28,10 @@ async def on_ready() -> None:
     """Things to do when the bot readies."""
     print(f"Logged in as\n{bot.user.name}\n{bot.user.id}\nv{__version__}\n"
           + "-" * 18)
+    bot.guild = typing.cast(Guild, bot.get_guild(865055891345506334))
+    bot.mod_channel = bot.get_channel(constants.MOD_CHANNEL)
+    bot.mod_pings = (f"{bot.guild.get_role(constants.BASED_MOD).mention} & "
+                     f"{bot.guild.get_role(constants.HELPFUL_MOD).mention}")
 
 
 @bot.event
@@ -34,7 +39,6 @@ async def on_message(message: Message) -> None:
     """Run on every message."""
     if message.author.discriminator != "0000":  # Ignore webhooks.
         links = wikilink.extract(message.content)
-        print(links)
         if links:
             try:
                 await message.channel.send("\n".join(wikilink.parse(i)

@@ -1,8 +1,7 @@
 """Cogs (categories of bot command)"""
-from typing import Tuple
-import discord
+from discord import Member
 from discord.ext import commands
-from discord.ext.commands import Bot, Cog, Context, MemberConverter
+from discord.ext.commands import Bot, Cog, Context
 
 import constants
 import utils
@@ -10,46 +9,53 @@ import utils
 
 class General(Cog, name="General"):  # type: ignore
     """General commands"""
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+
     @commands.command()
     async def trustme(self, ctx: Context) -> None:
-        "Nudges the mods to give you the `trusted` role. Usage: ~trustme"
-        channel = Bot.get_channel(ctx.bot, int(ctx.message.channel.id))
-        mod_channel = Bot.get_channel(ctx.bot, int(constants.MOD_CHANNEL))
-        await mod_channel.send(f"<@{int(constants.BASED_MOD)}> & <@{int(constants.HELPFUL_MOD)}> : <@{ctx.message.author.id}> wants the trusted role in {channel.name} - hopp hopp!")
+        """Nudges the mods to give you the `trusted` role. Usage: ~trustme"""
+        await self.bot.mod_channel.send(
+            f"{self.bot.mod_pings}: {ctx.message.author.mention} wants the "
+            f"*trusted* role in {ctx.message.channel.mention} – hopp hopp!"
+        )
+
+    @commands.command(aliases=['mods'])
+    async def mod(self, ctx: Context, *, reason: str) -> None:
+        """Requests mod attention for a given reason. Usage: ~mod {reason}"""
+        await self.bot.mod_channel.send(
+            f"{self.bot.mod_pings}: {ctx.message.author.mention} requests mod "
+            f"attention in {ctx.channel.mention}. Reason: {reason}"
+        )
 
     @commands.command()
-    async def mod(self, ctx: Context, reason: str) -> None:
-        "Requests mod attention for a given reason. Usage: ~mod {reason}"
-        channel = Bot.get_channel(ctx.bot, int(ctx.message.channel.id))
-        mod_channel = Bot.get_channel(ctx.bot, int(constants.MOD_CHANNEL))
-        await mod_channel.send(f"<@{int(constants.BASED_MOD)}> & <@{int(constants.HELPFUL_MOD)}> : <@{ctx.message.author.id}> requests mod attention in {channel.name}. Reason: {reason}")
-
-    @commands.command()
-    async def urgent(self, ctx: Context, reason: str) -> None:
-        "Requests URGENT mod attention for a given reason. Usage: ~urgent {reason}"
-        channel = Bot.get_channel(ctx.bot, int(ctx.message.channel.id))
-        mod_channel = Bot.get_channel(ctx.bot, int(constants.MOD_CHANNEL))
-        await utils.send_email(constants.EMAIL_FROM, [ constants.EMAIL_TO ], f"Urgent mod request from {ctx.message.author.name}", f"{ctx.message.author.name} requests urgent mod attention in {channel.name}. Reason: {reason}")
-        #await mod_channel.send(f"<@{int(constants.BASED_MOD)}> & <@{int(constants.HELPFUL_MOD)}> : <@{ctx.message.author.id}> requests urgent mod attention in {channel}. Reason: {reason}")
+    async def urgent(self, ctx: Context, *, reason: str) -> None:
+        """Requests URGENT mod attention for a given reason. Usage: ~urgent {reason}"""
+        await self.mod(ctx, reason=reason)
+        utils.send_email(
+            subject=f"Urgent mod request from {ctx.message.author.name}",
+            text=(f"{ctx.message.author.name} requests urgent mod attention in"
+                  f" {ctx.message.channel.name}. Reason: {reason}")
+        )
 
 
 class Mod(Cog, name="Moderation"):  # type: ignore
     """Mod-only commands"""
-    @commands.command()
-    @commands.has_any_role('based mod', 'helpful mod')
-    async def trust(self, ctx: Context, user_name: str) -> None:
-        "Sets a user as trusted. Usage: ~trust {username}"
-        user = await MemberConverter().convert(ctx, str(user_name))
-        trusted_role = discord.utils.get(user.guild.roles, name="trusted")
-        await user.add_roles(trusted_role)
-        await ctx.send(f"Setting <@{user.id}> as trusted")
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
 
     @commands.command()
     @commands.has_any_role('based mod', 'helpful mod')
-    async def spite(self, ctx: Context, user_name: str) -> None:
+    async def trust(self, ctx: Context, *, member: Member) -> None:
+        "Sets a user as trusted. Usage: ~trust {username}"
+        await member.add_roles(self.bot.guild.get_role(885647339207946280))
+        await ctx.send(f"Setting {member.mention} as trusted")
+
+    @commands.command()
+    @commands.has_any_role('based mod', 'helpful mod')
+    async def spite(self, ctx: Context, *, member: Member) -> None:
         "Spite a user. Usage: ~spite {username}"
-        user = await MemberConverter().convert(ctx, str(user_name))
-        await ctx.send(f"Consider yourself spited, <@{user.id}>")
+        await ctx.send(f"Consider yourself spited, {member.mention}")
 
 
 class BotInternal(Cog, name="Bot Internal", command_attrs={'hidden': True}):  # type: ignore
