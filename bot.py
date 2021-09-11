@@ -14,8 +14,8 @@ import wikilink
 __version__ = constants.VERSION
 
 bot = Bot(command_prefix='~',
-          description=("Based TheresNoBot\nCurrently just converting wikilinks "
-                       "for cabal goodness, but who knows what comes next"),
+          description=("Based TheresNoBot\nCurrently just converting wikilinks"
+                       " for cabal goodness, but who knows what comes next"),
           intents=discord.Intents.default(),
           case_insensitive=True)
 

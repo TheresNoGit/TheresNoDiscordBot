@@ -129,11 +129,17 @@ async def safesend(ctx: Context,
                        + "utput too long to send as message. Sorry.]",
                        file=file)
 
-async def send_email(from_email: str, to_email, subject: str, text: str) -> None:
+
+async def send_email(from_email: str,
+                     to_email: str,
+                     subject: str,
+                     text: str) -> requests.Response:
+    """Send an email."""
     return requests.post(
         constants.EMAIL_API_URL,
         auth=("api", constants.EMAIL_API_KEY),
         data={"from": from_email,
               "to": to_email,
               "subject": subject,
-              "text": text})
+              "text": text}
+    )
