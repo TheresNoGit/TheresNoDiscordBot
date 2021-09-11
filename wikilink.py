@@ -11,14 +11,13 @@ _VALID_LINK = re.compile(
     r"""
         \[\[
         (?!
-            (
-                [^]|]*
-                (
-                    ~{3,} .*?  # 3+ tildes is illegal.
-                    # So are certain combinations of .s and /s.
-                    | /\.\.?(/ .*?)?
+            (  # NOTE: Starting with a slash *is* legal, surprisingly.
+                [^]|]* ~{3,} .*?  # 3+ tildes is illegal.
+            |   (
+                   [^]|]* /\.\.?  # So is /./ or ending with a /.
+                |  \.\.? # Or . or .. or starting with a ./ or ../
                 )
-                | \.\.? .*?
+                (/ .*?)?
             )
             (\||\]\])
         )
