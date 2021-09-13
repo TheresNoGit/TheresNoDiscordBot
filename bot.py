@@ -53,6 +53,8 @@ async def on_message(message: Message) -> None:
 async def on_command_error(ctx: Context,
                            error: CommandError) -> None:
     """Notify a user that they have not provided an argument."""
+    if ctx.message.content.startswith("~~"):
+        return
     print(error)
     replies = {
         UserInputError: ("*You need to use the correct syntax...* "
