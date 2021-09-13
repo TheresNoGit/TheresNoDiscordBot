@@ -1,32 +1,28 @@
 """Parses wikilinks."""
 import re
-import urllib.parse
 
 from discord.ext.commands import UserInputError
 
 from utils import AliasDict
 
 
-_VALID_LINK = re.compile(
-    r"""
-        \[\[
-        (?!
-            (  # NOTE: Starting with a slash *is* legal, surprisingly.
-                [^]|]* ~{3,} .*?  # 3+ tildes is illegal.
-            |   (
-                   [^]|]* /\.\.?  # So is /./ or ending with a /.
-                |  \.\.? # Or . or .. or starting with a ./ or ../
-                )
-                (/ .*?)?
+_VALID_LINK = r"""
+    (?!
+        (  # NOTE: Starting with a slash *is* legal, surprisingly.
+            [^]|]* ~{3,} .*?  # 3+ tildes is illegal.
+        |   (
+                [^]|]* /\.\.?  # So is /./ or ending with a /.
+            |  \.\.? # Or . or .. or starting with a ./ or ../
             )
-            (\||\]\])
+            (/ .*?)?
         )
-        (?P<wikilink> [^][<>{}#|]+ )
-        ( \|.*? )?
-        \]\]
-    """,
-    re.VERBOSE
-)
+        (\||\]\])
+    )
+    (?P<wikilink> [^][<>{}#|]+ )
+    ( \|.*? )?
+"""
+_BRACKET_LINK = re.compile(fr"\[\[{_VALID_LINK}\]\]", re.X)
+_BRACE_LINK = re.compile(fr"\{{\{{{_VALID_LINK}\}}\}}", re.X)
 _WIKI_FAMILIES = AliasDict(
     {('w', 'testwiki', 'test2wiki', 'nost', 'nostalgia'): 'wikipedia',
      'wikt': 'wiktionary',
@@ -39,8 +35,7 @@ _WIKI_FAMILIES = AliasDict(
      'v': 'wikiversity',
      'voy': 'wikivoyage'},
     value_isnt_alias={
-        ('c', 'commons', 'm', 'meta', 'metawiki',
-         'incubator'): 'wikimedia',
+        ('c', 'commons', 'm', 'meta', 'metawiki', 'incubator'): 'wikimedia',
         'mw': 'mediawiki'
     }
 )
@@ -93,7 +88,10 @@ _VALID_PREFIXES = (_WIKI_FAMILIES.keys()
 
 def extract(text: str) -> list[str]:
     """Get a wikilink."""
-    return [i.group('wikilink') for i in _VALID_LINK.finditer(text)]
+    bracketed = [i.group('wikilink') for i in _BRACKET_LINK.finditer(text)]
+    braced = ["Template: " + i.group('wikilink')
+              for i in _BRACE_LINK.finditer(text)]
+    return bracketed + braced
 
 
 def parse(link: str) -> str:
@@ -130,4 +128,6 @@ def parse(link: str) -> str:
             prefixes[0] if prefixes[0] in _WIKI_LANGS else lang
         )
 
-    return (f"<https://{lang}.{family}.org/wiki/{urllib.parse.quote(page)}>")
+    escaped = (page.replace("?", "%3F").replace(" ", "_")
+               + "_" if page.endswith((")", ";", ":")) else "")
+    return f"<https://{lang}.{family}.org/wiki/{escaped}>"

@@ -39,12 +39,14 @@ async def on_message(message: Message) -> None:
     """Run on every message."""
     if message.author.discriminator != "0000":  # Ignore webhooks.
         links = wikilink.extract(message.content)
-        if links:
+        output = []
+        for i in links:
             try:
-                await message.channel.send("\n".join(wikilink.parse(i)
-                                                     for i in links))
+                output.append(wikilink.parse(i))
             except UserInputError:
                 pass
+        if output:
+            message.channel.send("\n".join(output))
         else:
             await bot.process_commands(message)
 
