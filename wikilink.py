@@ -96,7 +96,7 @@ def extract(text: str) -> list[str]:
     return bracketed + braced  # type: ignore
 
 
-def parse(link: str, template=False) -> Optional[str]:
+def parse(link: str, template: bool = False) -> Optional[str]:
     """Parse a wikilink."""
     parts = link.lstrip(':').split(':')
     # Check for text that isn't actually a lang/family code.
