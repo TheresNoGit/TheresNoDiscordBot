@@ -1,4 +1,6 @@
 """Cogs (categories of bot command)"""
+import random
+
 from discord import Member
 from discord.ext import commands
 from discord.ext.commands import Bot, Cog, Context
@@ -11,13 +13,21 @@ class General(Cog, name="General"):  # type: ignore
     """General commands"""
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+        self._genders = [
+            "female", "male", "demigirl", "demiguy", "agender", "demigender",
+            "genderfluid", "genderflux", "fluidflux", "xenogender", "cat",
+            "dog", "NaN", "no thanks", "404 not found", "gayyyyy",
+            "currently being discussed at Articles for deletion", "villain",
+            "French", "ruled safe at third, but play currently under review"
+        ]
 
-    @commands.command()
-    async def trustme(self, ctx: Context) -> None:
-        """Nudges the mods to give you the `trusted` role. Usage: ~trustme"""
-        await self.bot.mod_channel.send(
-            f"{self.bot.mod_pings}: {ctx.message.author.mention} wants the "
-            f"*trusted* role in {ctx.message.channel.mention} – hopp hopp!"
+    @commands.command(aliases=['gender'])
+    async def whatsmygender(self, ctx: Context) -> None:
+        """Because sometimes figuring out your own gender is too hard."""
+        await ctx.send(
+            f"Looks like your gender is {random.choice(self._genders)}.\n"
+            "Does that not sound right? It's possible that it's changed "
+            "already! Feel free to ask again."
         )
 
     @commands.command(aliases=['mods'])
@@ -26,6 +36,14 @@ class General(Cog, name="General"):  # type: ignore
         await self.bot.mod_channel.send(
             f"{self.bot.mod_pings}: {ctx.message.author.mention} requests mod "
             f"attention in {ctx.channel.mention}. Reason: {reason}"
+        )
+
+    @commands.command()
+    async def trustme(self, ctx: Context) -> None:
+        """Nudges the mods to give you the `trusted` role. Usage: ~trustme"""
+        await self.bot.mod_channel.send(
+            f"{self.bot.mod_pings}: {ctx.message.author.mention} wants the "
+            f"*trusted* role in {ctx.message.channel.mention} – hopp hopp!"
         )
 
     @commands.command()
