@@ -46,7 +46,7 @@ async def on_message(message: Message) -> None:
             except UserInputError:
                 pass
         if output:
-            message.channel.send("\n".join(output))
+            await message.channel.send("\n".join(output))
         else:
             await bot.process_commands(message)
 
