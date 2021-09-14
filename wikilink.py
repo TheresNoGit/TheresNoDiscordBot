@@ -1,7 +1,6 @@
 """Parses wikilinks."""
 import re
-
-from discord.ext.commands import UserInputError
+from typing import Optional
 
 from utils import AliasDict
 
@@ -88,13 +87,16 @@ _VALID_PREFIXES = (_WIKI_FAMILIES.keys()
 
 def extract(text: str) -> list[str]:
     """Get a wikilink."""
-    bracketed = [i.group('wikilink') for i in _BRACKET_LINK.finditer(text)]
-    braced = ["Template: " + i.group('wikilink')
-              for i in _BRACE_LINK.finditer(text)]
-    return bracketed + braced
+    bracketed = [parse(i.group('wikilink'))
+                 for i in _BRACKET_LINK.finditer(text)
+                 if i is not None]
+    braced = [parse(i.group('wikilink'), template=True)
+              for i in _BRACE_LINK.finditer(text)
+              if i is not None]
+    return bracketed + braced  # type: ignore
 
 
-def parse(link: str) -> str:
+def parse(link: str, template=False) -> Optional[str]:
     """Parse a wikilink."""
     parts = link.lstrip(':').split(':')
     # Check for text that isn't actually a lang/family code.
@@ -106,19 +108,20 @@ def parse(link: str) -> str:
     else:
         page = parts[-1]
         prefixes = []
+    page = "Template:" + page if template else page
     family, lang = 'wikipedia', 'en'
 
     if len(prefixes) > 2:
-        raise UserInputError
+        return None
     if len(prefixes) == 2:
         # Exactly 1 family code and exactly 1 language code.
         if not all(len(set(prefixes) & s) == 1
                    for s in (_WIKI_FAMILIES.keys(), _WIKI_LANGS)):
-            raise UserInputError
+            return None
         prefixes.sort(key=lambda x: x in _WIKI_FAMILIES)
         # Cases like `[[d:fr:Foo]]`.
         if prefixes[1] in _WIKI_PSEUDOLANGS:
-            raise UserInputError
+            return None
         family = _WIKI_FAMILIES[prefixes[1]]
         lang = prefixes[0]
     elif prefixes:
@@ -129,5 +132,5 @@ def parse(link: str) -> str:
         )
 
     escaped = (page.replace("?", "%3F").replace(" ", "_")
-               + "_" if page.endswith((")", ";", ":")) else "")
+               + ("_" if page.endswith((")", ";", ":")) else ""))
     return f"<https://{lang}.{family}.org/wiki/{escaped}>"
