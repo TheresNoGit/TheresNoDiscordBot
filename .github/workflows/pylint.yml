@@ -26,10 +26,4 @@ jobs:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       uses: Ilshidur/action-discord@master
       with:
-        args: 'Heck, <@886055326107971636> got updated on GitHub, lemme check if they broke it....'
-    - name: Discord notification 2
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      uses: Ilshidur/action-discord@master
-      with:
-        args: '~version'
+        args: 'Heck, <@886055326107971636> got updated on GitHub, someone restart the docker container pls....'
