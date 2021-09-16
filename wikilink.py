@@ -23,8 +23,7 @@ _VALID_LINK = r"""
 _BRACKET_LINK = re.compile(fr"\[\[{_VALID_LINK}\]\]", re.X)
 _BRACE_LINK = re.compile(fr"\{{\{{{_VALID_LINK}\}}\}}", re.X)
 _WIKI_FAMILIES = AliasDict(
-    {('w', 'testwiki', 'test2wiki', 'nost', 'nostalgia'): 'wikipedia',
-     'wikt': 'wiktionary',
+    {'wikt': 'wiktionary',
      'b': 'wikibooks',
      ('d', 'testwikidata'): 'wikidata',
      'n': 'wikinews',
@@ -34,6 +33,7 @@ _WIKI_FAMILIES = AliasDict(
      'v': 'wikiversity',
      'voy': 'wikivoyage'},
     value_isnt_alias={
+        ('w', 'testwiki', 'test2wiki', 'nost', 'nostalgia'): 'wikipedia',
         ('c', 'commons', 'm', 'meta', 'metawiki', 'incubator'): 'wikimedia',
         'mw': 'mediawiki'
     }
