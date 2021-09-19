@@ -17,7 +17,8 @@ _VALID_LINK = r"""
         )
         (\||\]\])
     )
-    (?P<wikilink> [^][<>{}#|]+ )
+    # Can contain an octothorpe but can't start with it.
+    (?P<wikilink> [^][<>{}#|] [^][<>{}|]+ )
     ( \|.*? )?
 """
 _BRACKET_LINK = re.compile(fr"\[\[{_VALID_LINK}\]\]", re.X)
