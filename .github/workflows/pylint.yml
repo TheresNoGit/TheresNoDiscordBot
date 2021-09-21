@@ -26,7 +26,8 @@ jobs:
     - name: Analysing the code with mypy
       run: |
         python -m mypy --install-types --non-interactive -v .
-    - name: Discord notification 1
+    - name: Discord notification
+      continue-on-error: true
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       uses: Ilshidur/action-discord@master
