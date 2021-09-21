@@ -1,7 +1,12 @@
 name: Mypy
 
-on: [push]
-
+on:
+    push:
+      branches:
+        - master
+    pull_request:
+      branches:
+        - master
 jobs:
   build:
 
@@ -26,4 +31,4 @@ jobs:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       uses: Ilshidur/action-discord@master
       with:
-        args: 'Heck, <@886055326107971636> got updated on GitHub, someone restart the docker container pls....'
+        args: 'Heck, <@886055326107971636> got updated on GitHub... Yo <@680822854920568834>, restart the docker container pls....'
