@@ -26,10 +26,3 @@ jobs:
     - name: Analysing the code with mypy
       run: |
         python -m mypy --install-types --non-interactive .
-    - name: Discord notification
-      continue-on-error: true
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      uses: Ilshidur/action-discord@master
-      with:
-        args: '<@886055326107971636> just got updated ({{ EVENT_PAYLOAD.repository.html_url }}/compare/{{ EVENT_PAYLOAD.push.after }}) ... Yo someone in <@&889831216646352956>, restart the docker container pls....'
