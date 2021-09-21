@@ -25,11 +25,11 @@ jobs:
         pip install mypy
     - name: Analysing the code with mypy
       run: |
-        python -m mypy --install-types --non-interactive -v .
+        python -m mypy --install-types --non-interactive .
     - name: Discord notification
       continue-on-error: true
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       uses: Ilshidur/action-discord@master
       with:
-        args: 'Heck, <@886055326107971636> got updated on GitHub... Yo <@680822854920568834>, restart the docker container pls....'
+        args: '<@886055326107971636> just got updated ({{ EVENT_PAYLOAD.push.compare }}) ... Yo someone in <@&889831216646352956>, restart the docker container pls....'
