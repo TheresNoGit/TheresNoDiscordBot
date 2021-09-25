@@ -20,7 +20,28 @@ bot = Bot(command_prefix='~',
           intents=discord.Intents.default(),
           case_insensitive=True)
 
-wikilink_regex = re.compile(r'\[\[(?P<wikilink>.*?)\]\]')
+funfact_regex = re.compile(r'^fun fact', re.IGNORECASE)
+devon_regex = re.compile(r'.*devon', re.IGNORECASE)
+sock_regex = re.compile(r'.*sock(puppet)?', re.IGNORECASE)
+
+
+async def checkMessage(message: Message) -> bool:
+    """Check a message against the regexes"""
+    links = wikilink.extract(message.content)
+    if links:
+        await message.channel.send("\n".join(links))
+        return True
+    elif funfact_regex.match(message.content):
+        await message.reply("Is it *really* a fun fact though...?")
+        return True
+    elif devon_regex.match(message.content):
+        await message.reply("*That* had better have been an insult about Devon.")
+        return True
+    elif sock_regex.match(message.content):
+        await message.add_reaction("🧦")
+        return True
+    else:
+        return False
 
 
 @bot.event
@@ -38,12 +59,10 @@ async def on_ready() -> None:
 async def on_message(message: Message) -> None:
     """Run on every message."""
     if message.author.discriminator != "0000":  # Ignore webhooks.
-        links = wikilink.extract(message.content)
-        if links:
-            await message.channel.send("\n".join(links))
-        else:
-            await bot.process_commands(message)
-
+        if message.author.id != constants.BOT_ID: # Ignore self.
+            if await checkMessage(message) == False:
+                await bot.process_commands(message)
+            
 
 @bot.event
 async def on_command_error(ctx: Context,
