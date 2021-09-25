@@ -13,6 +13,7 @@ MOD_CHANNEL = int(os.getenv('MOD_CHANNEL'))  # type: ignore
 BASED_MOD = int(os.getenv('BASED_MOD'))  # type: ignore
 HELPFUL_MOD = int(os.getenv('HELPFUL_MOD'))  # type: ignore
 TRUSTED = int(os.getenv('TRUSTED'))  # type: ignore
+BOT_ID = int(os.getenv('BOT_ID'))  # type: ignore
 
 EMAIL_API_URL = typing.cast(str, os.getenv('EMAIL_API_URL'))
 EMAIL_API_KEY = typing.cast(str, os.getenv('EMAIL_API_KEY'))
