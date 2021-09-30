@@ -7,6 +7,7 @@ import dotenv
 dotenv.load_dotenv()
 
 VERSION = "1.5.5"
+
 DISCORD_KEY = typing.cast(str, os.getenv('DISCORD_BOT'))
 GUILD = int(os.getenv('GUILD'))  # type: ignore
 MOD_CHANNEL = int(os.getenv('MOD_CHANNEL'))  # type: ignore
