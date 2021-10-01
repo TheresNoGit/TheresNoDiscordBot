@@ -8,12 +8,42 @@ on:
       branches:
         - master
 jobs:
+  check:
+    name: Check requirements & actions
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Set up Go 1.17.1
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17.1'
+
+    - name: Check GitHub actions
+      run: |
+        go install github.com/rhysd/actionlint/cmd/actionlint@latest
+        actionlint -verbose
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements.txt
+        python -m pip list -o
+        python -m pip check -v
+
   lint:
     name: Lint with mypy
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
+    
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
