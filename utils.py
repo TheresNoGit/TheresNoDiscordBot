@@ -133,18 +133,12 @@ async def safesend(ctx: Context,
 
 async def isDM(message: Message) -> bool:
     """Helper function to see if this message was a DM"""
-    if not message.guild:
-        return True
-    else:
-        return False
+    return not message.guild
 
 
 async def isEmbed(message: Message) -> bool:
     """Helper function to see if this message was an Embed"""
-    if message.embeds:
-        return True
-    else:
-        return False
+    return bool(message.embeds)
 
 
 async def getUTC() -> str:
