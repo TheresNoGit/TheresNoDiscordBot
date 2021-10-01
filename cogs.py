@@ -1,13 +1,13 @@
 """Cogs (categories of bot command)"""
 import random
+import discord
+import datetime
 
-from discord import Member
+from discord import Member, Embed
 from discord.ext import commands
 from discord.ext.commands import Bot, Cog, Context
 
 import constants
-import utils
-
 
 class General(Cog, name="General"):  # type: ignore
     """General commands"""
@@ -75,10 +75,29 @@ class Mod(Cog, name="Moderation"):  # type: ignore
 
 class BotInternal(Cog, name="Bot Internal", command_attrs={'hidden': True}):  # type: ignore
     """Commands that relate to the bot itself."""
+    def __init__(self, bot: Bot) -> None:
+        self.bot = bot
+    
     @commands.command()
     async def version(self, ctx: Context) -> None:
         "Gets the bots current version number"
-        await ctx.send(f"I'm currently running version {constants.VERSION}")
+        embed = Embed(
+            title=f"TheresNoBot v{constants.VERSION}",
+            description=f"I'm currently running version {constants.VERSION}",
+            type="rich",
+            url="https://github.com/TheresNoGit/TheresNoDiscordBot",
+            color=constants.DEBUG_COL,
+            timestamp=datetime.datetime.utcnow()
+        )
+        embed.set_footer(text=f"Codename: {constants.VERSION_NAME}")
+        await ctx.reply(embed=embed)
+
+    @commands.command()
+    @commands.has_any_role('mod', 'half mod')
+    async def activity(self, ctx: Context, *, activity: str) -> None:
+        "Change the bot activity (until restart). Usage: ~activity {new activity}"
+        await self.bot.change_presence(activity=discord.Game(name=f"{activity}"))
+        await ctx.send(f"Changed bot activity to {activity}")
 
     @commands.command()
     async def python(self, ctx: Context) -> None:

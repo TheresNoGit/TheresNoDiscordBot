@@ -1,6 +1,5 @@
 """Good cabal bot."""
 import random
-import re
 import typing
 
 import discord
@@ -11,6 +10,8 @@ from discord.ext.commands import (Bot, Context, CommandError, CommandNotFound,
 import cogs
 import constants
 import wikilink
+import regexes
+import utils
 
 __version__ = constants.VERSION
 
@@ -20,41 +21,64 @@ bot = Bot(command_prefix='~',
           intents=discord.Intents.default(),
           case_insensitive=True)
 
-funfact_regex = re.compile(r'^fun fact', re.IGNORECASE)
-devon_regex = re.compile(r'.*devon', re.IGNORECASE)
-sock_regex = re.compile(r'.*sock(puppet)?', re.IGNORECASE)
-
 
 async def checkMessage(message: Message) -> bool:
     """Check a message against the regexes"""
-    links = wikilink.extract(message.content)
-    if links:
-        await message.channel.send("\n".join(links))
-        return True
-    elif funfact_regex.match(message.content):
-        await message.reply("Is it *really* a fun fact though...?")
-        return True
-    elif devon_regex.match(message.content):
-        await message.reply("*That* had better have been an insult about Devon.")
-        return True
-    elif sock_regex.match(message.content):
-        await message.add_reaction("🧦")
+    if await utils.isDM(message):
+        # Message is a DM
+        await message.channel.send("Not yet implemented, sorry...")
+        # TODO: Probably another function to deal with any DM commands
         return True
     else:
-        return False
+        if await utils.isEmbed(message):
+            # Message is an embed
+            content = message.embeds[0].description
+            if regexes.new_member_regex.search(content):
+                await message.add_reaction("👋")
+                await message.channel.send("Looks like we've got a new one! 😅")
+                return True
+            else:
+                # Other embed, ignore
+                return False
+        else:
+            # Message is not a DM nor an embed
+            links = wikilink.extract(message.content)
+            if links:
+                await message.channel.send("\n".join(links))
+                return True
+            elif regexes.funfact_regex.search(message.content):
+                await message.reply("Is it *really* a fun fact though...?")
+                return True
+            elif regexes.devon_regex.search(message.content):
+                await message.reply("*That* had better have been an insult about Devon.")
+                return True
+            elif regexes.sock_regex.search(message.content):
+                await message.add_reaction("🧦")
+                return True
+            else:
+                return False
 
 
 @bot.event
 async def on_ready() -> None:
     """Things to do when the bot readies."""
-    print(f"Logged in as\n{bot.user.name}\n{bot.user.id}\nv{__version__}\n"
+    now_utc = await utils.getUTC()
+    print(f"{now_utc}\n" + "-" * 18)
+    if constants.DEV:
+        print("In development mode...\n" + "-" * 18)
+    print(f"Logged in as\n{bot.user.name}\n{bot.user.id}\nv{constants.VERSION} ({constants.VERSION_NAME})\n"
           + "-" * 18)
     bot.guild = typing.cast(Guild, bot.get_guild(865055891345506334))
     bot.mod_channel = bot.get_channel(constants.MOD_CHANNEL)
+    bot.spam_channel = bot.get_channel(constants.BOT_SPAM_CHANNEL)
+    bot.commands_channel = bot.get_channel(constants.COMMANDS_CHANNEL)
     bot.all_mod_channel = bot.get_channel(constants.ALL_MOD_CHANNEL)
     bot.mod_pings = (f"{bot.guild.get_role(constants.MOD_PLUS_PLUS).mention} & "
                      f"{bot.guild.get_role(constants.MOD).mention} & "
                      f"{bot.guild.get_role(constants.HALF_MOD).mention}")
+    bot.custom_activity = constants.BOT_ACTIVITY
+    await utils.sendLoggerMessage(bot, f"Restarted OK (v{__version__})", False)
+    await bot.change_presence(activity=discord.Game(name=f"{bot.custom_activity}"))
 
 
 @bot.event
@@ -85,6 +109,7 @@ async def on_command_error(ctx: Context,
             await ctx.send(v)
             break
     else:
+        await utils.sendLoggerMessage(bot, f"Got an unknown error in `on_command_error`", True)
         await ctx.send("Unknown error.  Scream (at Tamzin cos this code is mostly "
                        f"{random.choice(['hers', 'theirs', 'xyrs'])}).")
 
