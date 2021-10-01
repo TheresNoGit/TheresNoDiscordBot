@@ -153,7 +153,7 @@ async def sendLoggerMessage(ctx: Context, content: str, error: bool) -> None:
         if error:
             embed = Embed(
                 title="[ERROR MESSAGE]",
-                description=f"{content}",
+                description=content,
                 type="rich",
                 color=constants.ERROR_COL,
                 timestamp=datetime.datetime.utcnow()
@@ -161,7 +161,7 @@ async def sendLoggerMessage(ctx: Context, content: str, error: bool) -> None:
         else:
             embed = Embed(
                 title="[DEBUG MESSAGE]",
-                description=f"{content}",
+                description=content,
                 type="rich",
                 color=constants.DEBUG_COL,
                 timestamp=datetime.datetime.utcnow()
