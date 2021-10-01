@@ -5,11 +5,12 @@ sending directly, unless they handle Discord exceptions.
 """
 import io
 from typing import Optional, Set, Tuple, Union
+import time
+import datetime
 
-from discord import File, HTTPException
+from discord import File, HTTPException, Message, Embed
 from discord.ext.commands import Context
 
-import requests
 import constants
 
 # Uses typing.Tuple rather than tuple due to <https://github.com/python/mypy/issues/9980>.
@@ -128,3 +129,48 @@ async def safesend(ctx: Context,
                        + ("[Rest of o" if safe else "[O")
                        + "utput too long to send as message. Sorry.]",
                        file=file)
+
+
+async def isDM(message: Message) -> bool:
+    """Helper function to see if this message was a DM"""
+    if not message.guild:
+        return True
+    else:
+        return False
+
+
+async def isEmbed(message: Message) -> bool:
+    """Helper function to see if this message was an Embed"""
+    if message.embeds:
+        return True
+    else:
+        return False
+
+
+async def getUTC() -> str:
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+
+
+async def sendLoggerMessage(ctx: Context, content: str, error: bool) -> None:
+    """Helper function to send a DEBUG or ERROR message to the bot commands channel"""
+    # Only send if Dev = False
+    if not constants.DEV:
+        now_utc = await getUTC()
+        if error:
+            embed = Embed(
+                title="[ERROR MESSAGE]",
+                description=f"{content}",
+                type="rich",
+                color=constants.ERROR_COL,
+                timestamp=datetime.datetime.utcnow()
+            )
+        else:
+            embed = Embed(
+                title="[DEBUG MESSAGE]",
+                description=f"{content}",
+                type="rich",
+                color=constants.DEBUG_COL,
+                timestamp=datetime.datetime.utcnow()
+            )
+        
+        await ctx.commands_channel.send(embed=embed)
