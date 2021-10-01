@@ -33,7 +33,7 @@ class General(Cog, name="General"):  # type: ignore
     @commands.command(aliases=['mods'])
     async def mod(self, ctx: Context, *, reason: str) -> None:
         """Requests mod attention for a given reason. Usage: ~mod {reason}"""
-        await self.bot.mod_channel.send(
+        await self.bot.all_mod_channel.send(
             f"{self.bot.mod_pings}: {ctx.message.author.mention} requests mod "
             f"attention in {ctx.channel.mention}. Reason: {reason}"
         )
@@ -41,19 +41,9 @@ class General(Cog, name="General"):  # type: ignore
     @commands.command()
     async def trustme(self, ctx: Context) -> None:
         """Nudges the mods to give you the `trusted` role. Usage: ~trustme"""
-        await self.bot.mod_channel.send(
+        await self.bot.all_mod_channel.send(
             f"{self.bot.mod_pings}: {ctx.message.author.mention} wants the "
             f"*trusted* role in {ctx.message.channel.mention} – hopp hopp!"
-        )
-
-    @commands.command()
-    async def urgent(self, ctx: Context, *, reason: str) -> None:
-        """Requests URGENT mod attention for a given reason. Usage: ~urgent {reason}"""
-        await self.mod(ctx, reason=reason)
-        utils.send_email(
-            subject=f"Urgent mod request from {ctx.message.author.name}",
-            text=(f"{ctx.message.author.name} requests urgent mod attention in"
-                  f" {ctx.message.channel.name}. Reason: {reason}")
         )
 
 
@@ -63,14 +53,21 @@ class Mod(Cog, name="Moderation"):  # type: ignore
         self.bot = bot
 
     @commands.command()
-    @commands.has_any_role('based mod', 'helpful mod')
+    @commands.has_any_role('mod', 'half mod')
     async def trust(self, ctx: Context, *, member: Member) -> None:
         "Sets a user as trusted. Usage: ~trust {username}"
-        await member.add_roles(self.bot.guild.get_role(885647339207946280))
+        await member.add_roles(self.bot.guild.get_role(constants.TRUSTED))
         await ctx.send(f"Setting {member.mention} as trusted")
 
     @commands.command()
-    @commands.has_any_role('based mod', 'helpful mod')
+    @commands.has_any_role('mod', 'half mod')
+    async def untrust(self, ctx: Context, *, member: Member) -> None:
+        "Sets a user as no longer trusted. Usage: ~untrust {username}"
+        await member.remove_roles(self.bot.guild.get_role(constants.TRUSTED))
+        await ctx.send(f"Setting {member.mention} as no longer trusted")
+
+    @commands.command()
+    @commands.has_any_role('mod', 'half mod')
     async def spite(self, ctx: Context, *, member: Member) -> None:
         "Spite a user. Usage: ~spite {username}"
         await ctx.send(f"Consider yourself spited, {member.mention}")

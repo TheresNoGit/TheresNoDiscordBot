@@ -51,8 +51,10 @@ async def on_ready() -> None:
           + "-" * 18)
     bot.guild = typing.cast(Guild, bot.get_guild(865055891345506334))
     bot.mod_channel = bot.get_channel(constants.MOD_CHANNEL)
-    bot.mod_pings = (f"{bot.guild.get_role(constants.BASED_MOD).mention} & "
-                     f"{bot.guild.get_role(constants.HELPFUL_MOD).mention}")
+    bot.all_mod_channel = bot.get_channel(constants.ALL_MOD_CHANNEL)
+    bot.mod_pings = (f"{bot.guild.get_role(constants.MOD_PLUS_PLUS).mention} & "
+                     f"{bot.guild.get_role(constants.MOD).mention} & "
+                     f"{bot.guild.get_role(constants.HALF_MOD).mention}")
 
 
 @bot.event
