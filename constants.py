@@ -10,7 +10,7 @@ dotenv.load_dotenv()
 DEV = False
 
 # Version
-VERSION = "1.6.0"
+VERSION = "1.6.1"
 VERSION_NAME = "spicy"
 
 # Bot config
@@ -29,6 +29,7 @@ MOD_CHANNEL = int(os.getenv('MOD_CHANNEL'))  # type: ignore
 ALL_MOD_CHANNEL = int(os.getenv('ALL_MOD_CHANNEL'))  # type: ignore
 BOT_SPAM_CHANNEL = int(os.getenv('BOT_SPAM_CHANNEL'))  # type: ignore
 COMMANDS_CHANNEL = int(os.getenv('COMMANDS_CHANNEL'))  # type: ignore
+WELCOME_CHANNEL = int(os.getenv('WELCOME_CHANNEL'))  # type: ignore
 
 # Misc
 BOT_ACTIVITY = typing.cast(str, os.getenv('BOT_ACTIVITY'))  # type: ignore

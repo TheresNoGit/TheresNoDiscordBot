@@ -1,9 +1,10 @@
 """Good cabal bot."""
 import random
 import typing
+import datetime
 
 import discord
-from discord import Guild, Message
+from discord import Guild, Message, Embed, Member
 from discord.ext.commands import (Bot, Context, CommandError, CommandNotFound,
                                   UserInputError, MissingAnyRole)
 
@@ -18,7 +19,7 @@ __version__ = constants.VERSION
 bot = Bot(command_prefix='~',
           description=("Based TheresNoBot\nCurrently just converting wikilinks"
                        " for cabal goodness, but who knows what comes next"),
-          intents=discord.Intents.default(),
+          intents=discord.Intents.all(),
           case_insensitive=True)
 
 
@@ -35,7 +36,6 @@ async def checkMessage(message: Message) -> bool:
             content = message.embeds[0].description
             if regexes.new_member_regex.search(content):
                 await message.add_reaction("👋")
-                await message.channel.send("Looks like we've got a new one! 😅")
                 return True
             else:
                 # Other embed, ignore
@@ -73,12 +73,37 @@ async def on_ready() -> None:
     bot.spam_channel = bot.get_channel(constants.BOT_SPAM_CHANNEL)
     bot.commands_channel = bot.get_channel(constants.COMMANDS_CHANNEL)
     bot.all_mod_channel = bot.get_channel(constants.ALL_MOD_CHANNEL)
+    bot.welcome_channel = bot.get_channel(constants.WELCOME_CHANNEL)
     bot.mod_pings = (f"{bot.guild.get_role(constants.MOD_PLUS_PLUS).mention} & "
                      f"{bot.guild.get_role(constants.MOD).mention} & "
                      f"{bot.guild.get_role(constants.HALF_MOD).mention}")
     bot.custom_activity = constants.BOT_ACTIVITY
     await utils.sendLoggerMessage(bot, f"Restarted OK (v{__version__})", False)
     await bot.change_presence(activity=discord.Game(name=f"{bot.custom_activity}"))
+
+
+@bot.event
+async def on_member_join(member: Member) -> None:
+    """Things to do when a new member joins"""
+    embed = Embed(
+        title=f"Ooooh new person!",
+        description=(f"Well hello {member.mention} :slight_smile:\n"
+                    "Where did you find the invite?\n\n"
+                    "🐦 - Twitter\n"
+                    "🗣️ - DM/personal invite\n"
+                    "👀 - Somewhere else..\n"),
+        type="rich",
+        color=constants.DEBUG_COL,
+        timestamp=datetime.datetime.utcnow()
+    )
+    reacts = ['🐦', '🗣️', '👀']
+
+    # We assume that because its a new member join, that they'll be in the "welcome channel"
+    message = await bot.welcome_channel.send(embed=embed)
+
+    # Add reacts
+    for react in reacts:
+        await message.add_reaction(react)
 
 
 @bot.event
