@@ -108,7 +108,7 @@ async def on_member_join(member: Member) -> None:
         await message.add_reaction(react)
     
     # Notify mods
-    await cogs.BotInternal.notifyNewMember(bot, member)
+    await cogs.BotInternal.notifyModsOfNewMember(bot, member)
 
 
 @bot.event

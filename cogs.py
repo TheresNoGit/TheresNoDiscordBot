@@ -78,7 +78,7 @@ class BotInternal(Cog, name="Bot Internal", command_attrs={'hidden': True}):  # 
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 
-    async def notifyNewMember(bot: Bot, member: Member) -> None:
+    async def notifyModsOfNewMember(bot: Bot, member: Member) -> None:
         "Send a notification to the mod channel of a new member"
         if not constants.DEV:
             await bot.all_mod_channel.send(f"{member.mention} has just joined in <#{constants.WELCOME_CHANNEL}>")
