@@ -77,6 +77,11 @@ class BotInternal(Cog, name="Bot Internal", command_attrs={'hidden': True}):  # 
     """Commands that relate to the bot itself."""
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
+
+    async def notifyNewMember(bot: Bot, member: Member) -> None:
+        "Send a notification to the mod channel of a new member"
+        if not constants.DEV:
+            await bot.all_mod_channel.send(f"{member.mention} has just joined in <#{constants.WELCOME_CHANNEL}>")
     
     @commands.command()
     async def version(self, ctx: Context) -> None:

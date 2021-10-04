@@ -32,14 +32,7 @@ async def checkMessage(message: Message) -> bool:
         return True
     else:
         if await utils.isEmbed(message):
-            # Message is an embed
-            content = message.embeds[0].description
-            if regexes.new_member_regex.search(content):
-                await message.add_reaction("👋")
-                return True
-            else:
-                # Other embed, ignore
-                return False
+            return False # TODO: No longer have any embed actions, refactor/remove?
         else:
             # Message is not a DM nor an embed
             links = wikilink.extract(message.content)
@@ -86,12 +79,21 @@ async def on_ready() -> None:
 async def on_member_join(member: Member) -> None:
     """Things to do when a new member joins"""
     embed = Embed(
-        title=f"Ooooh new person!",
-        description=(f"Well hello {member.mention} :slight_smile:\n"
-                    "Where did you find the invite?\n\n"
-                    "🐦 - Twitter\n"
-                    "🗣️ - DM/personal invite\n"
-                    "👀 - Somewhere else..\n"),
+        title="A new member just joined..",
+        description=(f"🎉 Everyone please welcome {member.mention}! 🎉\n\n"
+                    f"This server is run by <@{constants.USER_OWNER}>, and has a bit of everything - we're really glad you're here 🙂\n\n"
+                    "**Hold up!**\n"
+                    f"You're currently <@&{constants.NEW}>, and need the <@&{constants.TRUSTED}> role before you can start joining channels.\n"
+                    "Normally a mod will give it to you pretty quick, but if you've been waiting for a little while, "
+                    "please type **`~trustme`** and I'll give them a nudge! 😜\n\n"
+                    f"Once you have the role, you'll then be able to go into the <#{constants.META_CHANNEL}> "
+                    "channel and grab some more *interesting* roles, "
+                    "which will open the server up a bit more.\n\n"
+                    "Lastly, just so we know which invites are getting used, could you *react* to answer the below? 😅\n\n"
+                    "**Where did you find the invite?**\n"
+                    " - If you found it on Twitter, click the 🐦\n"
+                    " - If you were invited directly by someone, click on the 🗣️\n"
+                    " - Or maybe you found it somewhere else? That's a *bit sus*, but its okay.. click on the 👀\n"),
         type="rich",
         color=constants.DEBUG_COL,
         timestamp=datetime.datetime.utcnow()
@@ -104,6 +106,9 @@ async def on_member_join(member: Member) -> None:
     # Add reacts
     for react in reacts:
         await message.add_reaction(react)
+    
+    # Notify mods
+    await cogs.BotInternal.notifyNewMember(bot, member)
 
 
 @bot.event
@@ -113,7 +118,7 @@ async def on_message(message: Message) -> None:
         if message.author.id != constants.BOT_ID: # Ignore self.
             if await checkMessage(message) == False:
                 await bot.process_commands(message)
-            
+
 
 @bot.event
 async def on_command_error(ctx: Context,
