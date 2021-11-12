@@ -21,7 +21,7 @@ platformdirs==2.4.0
 pycodestyle==2.7.0
 pyflakes==2.3.1
 pylint==2.10.2
-python-dotenv==0.19.0
+python-dotenv==0.19.2
 requests==2.26.0
 toml==0.10.2
 types-requests==2.25.9
