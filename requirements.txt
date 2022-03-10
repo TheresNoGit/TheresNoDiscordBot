@@ -28,5 +28,5 @@ types-requests==2.25.9
 typing-extensions==3.10.0.2
 tzdata==2021.2.post0
 urllib3==1.26.7
-wrapt==1.12.1
+wrapt==1.14.0
 yarl==1.6.3
