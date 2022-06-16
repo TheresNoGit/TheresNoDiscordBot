@@ -12,7 +12,7 @@ discord.py==1.7.3
 flake8==3.9.2
 idna==3.2
 isort==5.10.1
-lazy-object-proxy==1.6.0
+lazy-object-proxy==1.7.1
 mccabe==0.6.1
 multidict==6.0.2
 mypy==0.961
