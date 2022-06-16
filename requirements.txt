@@ -24,7 +24,7 @@ pylint==2.10.2
 python-dotenv==0.20.0
 requests==2.26.0
 toml==0.10.2
-types-requests==2.25.9
+types-requests==2.27.30
 typing-extensions==3.10.0.2
 tzdata==2021.2.post0
 urllib3==1.26.7
