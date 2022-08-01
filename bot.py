@@ -39,15 +39,6 @@ async def checkMessage(message: Message) -> bool:
             if links:
                 await message.channel.send("\n".join(links))
                 return True
-            elif regexes.funfact_regex.search(message.content):
-                await message.reply("Is it *really* a fun fact though...?")
-                return True
-            elif regexes.devon_regex.search(message.content):
-                await message.reply("*That* had better have been an insult about Devon.")
-                return True
-            elif regexes.sock_regex.search(message.content):
-                await message.add_reaction("🧦")
-                return True
             else:
                 return False
 
