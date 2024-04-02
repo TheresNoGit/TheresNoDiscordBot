@@ -133,14 +133,14 @@ class Mod(Cog, name="Moderation"):  # type: ignore
     @commands.has_any_role('mod', 'half mod')
     async def trust(self, ctx: Context, *, member: Member) -> None:
         "Sets a user as trusted. Usage: ~trust {username}"
-        await member.add_roles(self.bot.guild.get_role(constants.TRUSTED))
+        await member.add_roles(ctx.guild.get_role(constants.TRUSTED))
         await ctx.send(f"Setting {member.mention} as trusted")
 
     @commands.command()
     @commands.has_any_role('mod', 'half mod')
     async def untrust(self, ctx: Context, *, member: Member) -> None:
         "Sets a user as no longer trusted. Usage: ~untrust {username}"
-        await member.remove_roles(self.bot.guild.get_role(constants.TRUSTED))
+        await member.remove_roles(ctx.guild.get_role(constants.TRUSTED))
         await ctx.send(f"Setting {member.mention} as no longer trusted")
 
     @commands.command()

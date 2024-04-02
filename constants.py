@@ -15,7 +15,6 @@ VERSION_NAME = "Flirty"
 
 # Bot config
 DISCORD_KEY = typing.cast(str, os.getenv('DISCORD_BOT'))  # type: ignore
-BOT_ID = int(os.getenv('BOT_ID'))  # type: ignore
 GUILD = int(os.getenv('GUILD'))  # type: ignore
 
 # Roles
