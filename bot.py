@@ -2,7 +2,7 @@
 import random
 import typing
 import datetime
-
+import asyncio
 import discord
 from discord import Guild, Message, Embed, Member
 from discord.ext.commands import (Bot, Context, CommandError, CommandNotFound,
@@ -133,9 +133,10 @@ async def on_command_error(ctx: Context,
         await ctx.send("Unknown error.  Scream (at Tamzin cos this code is mostly "
                        f"{random.choice(['hers', 'theirs', 'xyrs'])}).")
 
+async def setup():
+    for cog in (cogs.BotInternal, cogs.Mod, cogs.General):
+        await bot.add_cog(cog(bot))
 
-for cog in (cogs.BotInternal, cogs.Mod, cogs.General):
-    bot.add_cog(cog(bot))
-
+asyncio.run(setup())
 
 bot.run(constants.DISCORD_KEY)
