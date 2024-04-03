@@ -2,7 +2,7 @@
 import random
 import typing
 import datetime
-
+import asyncio
 import discord
 from discord import Guild, Message, Embed, Member
 from discord.ext.commands import (Bot, Context, CommandError, CommandNotFound,
@@ -11,7 +11,6 @@ from discord.ext.commands import (Bot, Context, CommandError, CommandNotFound,
 import cogs
 import constants
 import wikilink
-import regexes
 import utils
 
 __version__ = constants.VERSION
@@ -52,7 +51,7 @@ async def on_ready() -> None:
         print("In development mode...\n" + "-" * 18)
     print(f"Logged in as\n{bot.user.name}\n{bot.user.id}\nv{constants.VERSION} ({constants.VERSION_NAME})\n"
           + "-" * 18)
-    bot.guild = typing.cast(Guild, bot.get_guild(865055891345506334))
+    bot.guild = typing.cast(Guild, bot.get_guild(constants.GUILD))
     bot.mod_channel = bot.get_channel(constants.MOD_CHANNEL)
     bot.spam_channel = bot.get_channel(constants.BOT_SPAM_CHANNEL)
     bot.commands_channel = bot.get_channel(constants.COMMANDS_CHANNEL)
@@ -106,7 +105,7 @@ async def on_member_join(member: Member) -> None:
 async def on_message(message: Message) -> None:
     """Run on every message."""
     if message.author.discriminator != "0000":  # Ignore webhooks.
-        if message.author.id != constants.BOT_ID: # Ignore self.
+        if not message.is_system() and message.author.id != bot.user.id: # Ignore self.
             if await checkMessage(message) == False:
                 await bot.process_commands(message)
 
@@ -134,9 +133,10 @@ async def on_command_error(ctx: Context,
         await ctx.send("Unknown error.  Scream (at Tamzin cos this code is mostly "
                        f"{random.choice(['hers', 'theirs', 'xyrs'])}).")
 
+async def setup():
+    for cog in (cogs.BotInternal, cogs.Mod, cogs.General):
+        await bot.add_cog(cog(bot))
 
-for cog in (cogs.BotInternal, cogs.Mod, cogs.General):
-    bot.add_cog(cog(bot))
-
+asyncio.run(setup())
 
 bot.run(constants.DISCORD_KEY)
