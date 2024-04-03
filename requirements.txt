@@ -1,5 +1,5 @@
 ﻿asyncio==3.4.3
-aiohttp==3.8.4
+aiohttp==3.9.3
 async-timeout==4.0.2
 attrs==21.4.0
 autopep8==2.0.2
