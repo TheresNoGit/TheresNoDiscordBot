@@ -99,7 +99,7 @@ async def on_command_error(ctx: Context,
                        f"{random.choice(['hers', 'theirs', 'xyrs'])}).")
 
 
-for cog in (cogs.BotInternal, cogs.Mod, cogs.General):
+for cog in (cogs.BotInternal, cogs.General):
     bot.add_cog(cog(bot))
 
 
