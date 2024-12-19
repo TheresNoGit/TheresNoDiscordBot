@@ -10,8 +10,8 @@ dotenv.load_dotenv()
 DEV = False
 
 # Version
-VERSION = "1.7.0"
-VERSION_NAME = "Flirty"
+VERSION = "2.0.0"
+VERSION_NAME = "b0rk"
 
 # Bot config
 DISCORD_KEY = typing.cast(str, os.getenv('DISCORD_BOT'))  # type: ignore

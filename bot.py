@@ -67,42 +67,6 @@ async def on_ready() -> None:
 
 
 @bot.event
-async def on_member_join(member: Member) -> None:
-    """Things to do when a new member joins"""
-    embed = Embed(
-        title="A new member just joined..",
-        description=(f"🎉 Everyone please welcome {member.mention}! 🎉\n\n"
-                    f"This server is run by <@{constants.USER_OWNER}>, and has a bit of everything - we're really glad you're here 🙂\n\n"
-                    "**Hold up!**\n"
-                    f"You're currently <@&{constants.NEW}>, and need the <@&{constants.TRUSTED}> role before you can start joining channels.\n"
-                    "Normally a mod will give it to you pretty quick, but if you've been waiting for a little while, "
-                    "please type **`~trustme`** and I'll give them a nudge! 😜\n\n"
-                    f"Once you have the role, you'll then be able to go into the <#{constants.META_CHANNEL}> "
-                    "channel and grab some more *interesting* roles, "
-                    "which will open the server up a bit more.\n\n"
-                    "Lastly, just so we know which invites are getting used, could you *react* to answer the below? 😅\n\n"
-                    "**Where did you find the invite?**\n"
-                    " - If you found it on Twitter, click the 🐦\n"
-                    " - If you were invited directly by someone, click on the 🗣️\n"
-                    " - Or maybe you found it somewhere else? That's a *bit sus*, but its okay.. click on the 👀\n"),
-        type="rich",
-        color=constants.DEBUG_COL,
-        timestamp=datetime.datetime.utcnow()
-    )
-    reacts = ['🐦', '🗣️', '👀']
-
-    # We assume that because its a new member join, that they'll be in the "welcome channel"
-    message = await bot.welcome_channel.send(embed=embed)
-
-    # Add reacts
-    for react in reacts:
-        await message.add_reaction(react)
-    
-    # Notify mods
-    await cogs.BotInternal.notifyModsOfNewMember(bot, member)
-
-
-@bot.event
 async def on_message(message: Message) -> None:
     """Run on every message."""
     if message.author.discriminator != "0000":  # Ignore webhooks.
